@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Practice Quiz</title>
+
+  <!-- MathJax for textbook-style math (stacked fractions, subscripts, superscripts) -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(','\\)'], ['$', '$']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#111a2e;
+      --panel2:#0f172a;
+      --text:#e8eefc;
+      --muted:#a9b4d6;
+      --accent:#7aa2ff;
+      --good:#3ddc97;
+      --bad:#ff6b6b;
+      --border:rgba(255,255,255,.12);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 700px at 15% 10%, rgba(122,162,255,.25), transparent 60%),
+                  radial-gradient(1000px 600px at 80% 30%, rgba(61,220,151,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+    }
+    .app{
+      width:min(980px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    header{
+      padding:16px 18px;
+      background: linear-gradient(90deg, rgba(122,162,255,.18), rgba(61,220,151,.10));
+      border-bottom:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .dot{
+      width:12px;height:12px;border-radius:50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(122,162,255,.15);
+    }
+    .title{
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+    .sub{
+      color:var(--muted);
+      font-size:.92rem;
+      margin-top:2px;
+    }
+    .scorebar{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .pill{
+      border:1px solid var(--border);
+      background: rgba(17,26,46,.65);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:.92rem;
+      color:var(--text);
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .pill span{
+      color:var(--muted);
+    }
+
+    main{
+      padding:18px;
+      background: rgba(15,23,42,.55);
+    }
+
+    .card{
+      background: rgba(17,26,46,.72);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      padding:16px;
+    }
+
+    .row{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .col{
+      flex:1 1 320px;
+      min-width:280px;
+    }
+
+    label{
+      display:block;
+      color:var(--muted);
+      margin:10px 0 6px;
+      font-size:.92rem;
+    }
+    input[type="number"]{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.18);
+      color:var(--text);
+      outline:none;
+    }
+
+    button{
+      cursor:pointer;
+      border:none;
+      border-radius: 14px;
+      padding:10px 14px;
+      font-weight:650;
+      color:var(--text);
+      background: rgba(122,162,255,.22);
+      border:1px solid rgba(122,162,255,.35);
+      transition: transform .05s ease, filter .2s ease, background .2s ease;
+    }
+    button:hover{ filter: brightness(1.08); }
+    button:active{ transform: translateY(1px); }
+    button.secondary{
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--border);
+      font-weight:600;
+    }
+    button.good{
+      background: rgba(61,220,151,.18);
+      border:1px solid rgba(61,220,151,.35);
+    }
+    button.bad{
+      background: rgba(255,107,107,.16);
+      border:1px solid rgba(255,107,107,.35);
+    }
+    button:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .home h1{
+      margin:4px 0 4px;
+      font-size:1.55rem;
+      letter-spacing:.2px;
+    }
+    .home p{
+      color:var(--muted);
+      margin:0 0 10px;
+      line-height:1.45;
+    }
+
+    .qwrap{
+      display:none;
+    }
+    .qmeta{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+      color:var(--muted);
+      font-size:.95rem;
+    }
+    .qprompt{
+      font-size:1.06rem;
+      line-height:1.5;
+      margin-bottom:12px;
+    }
+    .choices{
+      display:grid;
+      gap:10px;
+      margin: 10px 0 14px;
+    }
+    .choice{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(0,0,0,.12);
+    }
+    .choice input{ margin-top:3px; transform: scale(1.1); }
+    .choice .letter{
+      min-width:24px;
+      font-weight:700;
+      color: var(--text);
+    }
+    .choice .text{
+      color: var(--text);
+      line-height:1.45;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .feedback{
+      margin-top:14px;
+      padding:12px;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.14);
+      display:none;
+    }
+    .feedback.ok{
+      border-color: rgba(61,220,151,.35);
+      background: rgba(61,220,151,.10);
+    }
+    .feedback.no{
+      border-color: rgba(255,107,107,.35);
+      background: rgba(255,107,107,.08);
+    }
+    .feedback strong{
+      display:block;
+      margin-bottom:6px;
+      font-size:1.02rem;
+    }
+    .explain{
+      color: var(--text);
+      line-height:1.55;
+    }
+    .smallmuted{
+      color:var(--muted);
+      font-size:.92rem;
+      margin-top:6px;
+    }
+
+    .footer{
+      margin-top:14px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-size:.9rem;
+    }
+    .linklike{
+      color:var(--accent);
+      text-decoration:underline;
+      cursor:pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="dot"></div>
+        <div>
+          <div class="title">Practice Quiz</div>
+          <div class="sub">One question per page • Math renders like a textbook</div>
+        </div>
+      </div>
+
+      <div class="scorebar">
+        <div class="pill"><span>Correct</span><b id="correctCount">0</b></div>
+        <div class="pill"><span>Attempted</span><b id="attemptedCount">0</b></div>
+        <div class="pill"><span>Question</span><b id="qCounter">—</b></div>
+      </div>
+    </header>
+
+    <main>
+      <!-- HOME -->
+      <section id="home" class="card home">
+        <h1>Welcome 👋</h1>
+        <p>
+          This quiz gives you instant feedback and a short explanation after each question.
+          You can start from any question number if you want to practise a specific section.
+        </p>
+
+        <div class="row">
+          <div class="col">
+            <label for="startQ">Start on question number (1–51)</label>
+            <input id="startQ" type="number" min="1" max="51" value="1" />
+          </div>
+
+          <div class="col">
+            <label for="startCorrect">If you start later, enter your <b>correct points so far</b> (optional)</label>
+            <input id="startCorrect" type="number" min="0" value="0" />
+            <div class="smallmuted">If you leave everything at 0, your score starts fresh.</div>
+          </div>
+
+          <div class="col">
+            <label for="startAttempted">Enter your <b>attempted so far</b> (optional)</label>
+            <input id="startAttempted" type="number" min="0" value="0" />
+            <div class="smallmuted">Tip: If you only track points, set attempted = correct.</div>
+          </div>
+        </div>
+
+        <div class="actions" style="margin-top:14px;">
+          <button id="beginBtn">Start Quiz</button>
+          <button id="resumeBtn" class="secondary" style="display:none;">Resume Saved Progress</button>
+          <button id="resetSavedBtn" class="secondary" style="display:none;">Clear Saved Progress</button>
+        </div>
+      </section>
+
+      <!-- QUESTION VIEW -->
+      <section id="quiz" class="card qwrap">
+        <div class="qmeta">
+          <div><b id="qTitle">Question</b></div>
+          <div id="qTopic"> </div>
+        </div>
+
+        <div id="qPrompt" class="qprompt"></div>
+
+        <div id="choices" class="choices"></div>
+
+        <div class="actions">
+          <button id="acceptBtn" class="good">Accept</button>
+          <button id="continueBtn" disabled>Continue</button>
+          <button id="backHomeBtn" class="secondary">Home</button>
+        </div>
+
+        <div id="feedback" class="feedback">
+          <strong id="fbTitle"></strong>
+          <div id="fbBody" class="explain"></div>
+        </div>
+
+        <div class="footer">
+          <div><span class="linklike" id="saveLink">Save progress</span> • <span class="linklike" id="loadLink">Load saved</span></div>
+          <div><span class="linklike" id="restartLink">Restart from Q1</span></div>
+        </div>
+      </section>
+
+      <!-- FINISH -->
+      <section id="finish" class="card qwrap">
+        <h1 style="margin:4px 0 8px;">Finished 🎉</h1>
+        <p style="color:var(--muted); margin:0 0 10px; line-height:1.45;">
+          You reached the end of the quiz.
+        </p>
+        <div class="pill" style="display:inline-flex; margin-bottom:14px;">
+          <span>Final Score</span>
+          <b><span id="finalCorrect">0</span> / <span id="finalAttempted">0</span></b>
+        </div>
+        <div class="actions">
+          <button id="restartBtn">Restart</button>
+          <button id="finishHomeBtn" class="secondary">Home</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ---------------------------
+    // QUESTION BANK (51 questions)
+    // ---------------------------
+    // Note: Math is written in MathJax (LaTeX) inside \( ... \)
+
+    const questions = [
+      // 1–10
+      {
+        id: 1, topic: "Probability basics",
+        prompt: `Conditional probability \\(P(A\\mid B)\\) means:`,
+        choices: [
+          `\\(P(A\\cap B)\\)`,
+          `Probability that \\(A\\) happens <b>given</b> that \\(B\\) happened`,
+          `Probability that \\(A\\) does not happen`,
+          `Probability that either \\(A\\) or \\(B\\) happens`
+        ],
+        answerIndex: 1,
+        explanation: `\\(P(A\\mid B)\\) reads “probability of \\(A\\) given \\(B\\)”. It tells you how likely \\(A\\) is <em>after</em> you already know \\(B\\) occurred.`
+      },
+      {
+        id: 2, topic: "Sample space",
+        prompt: `Two coins are tossed one after the other. The sample space is:`,
+        choices: [
+          `\\(\\{H,T,HT,TH\\}\\)`,
+          `\\(\\{HH,HT,TH,TT\\}\\)`,
+          `\\(\\{H,T\\}\\)`,
+          `\\(\\{HH,TT\\}\\)`
+        ],
+        answerIndex: 1,
+        explanation: `Each coin has 2 outcomes. Two tosses gives 4 ordered outcomes: \\(HH,HT,TH,TT\\).`
+      },
+      {
+        id: 3, topic: "Independent events",
+        prompt: `If \\(P(A)=0.35\\), \\(P(B)=0.50\\), and \\(A\\) and \\(B\\) are independent, find \\(P(A\\cap B)\\).`,
+        choices: [`\\(0.85\\)`, `\\(0.175\\)`, `\\(0.15\\)`, `\\(0.70\\)`],
+        answerIndex: 1,
+        explanation: `For independent events: \\(P(A\\cap B)=P(A)P(B)=0.35\\times 0.50=0.175\\).`
+      },
+      {
+        id: 4, topic: "Statistics",
+        prompt: `The median of a data set is:`,
+        choices: [
+          `The most frequent value`,
+          `The average of all values`,
+          `The middle value when ordered`,
+          `Highest value minus lowest value`
+        ],
+        answerIndex: 2,
+        explanation: `Order the data. The median is the middle value (or average of the two middle values if there is an even number of data points).`
+      },
+      {
+        id: 5, topic: "Statistics",
+        prompt: `Find the range of the data set \\(\\{6,\\,11,\\,14,\\,18,\\,19,\\,27\\}\\).`,
+        choices: [`\\(21\\)`, `\\(19\\)`, `\\(33\\)`, `\\(11\\)`],
+        answerIndex: 0,
+        explanation: `Range \\(=\\text{max}-\\text{min}=27-6=21\\).`
+      },
+      {
+        id: 6, topic: "Data displays",
+        prompt: `Which representation uses a table to show how often each value occurs?`,
+        choices: [`Pie chart`, `Frequency distribution`, `Box-and-whisker plot`, `Scatter plot`],
+        answerIndex: 1,
+        explanation: `A frequency distribution (frequency table) lists values (or intervals) and how many times they occur.`
+      },
+      {
+        id: 7, topic: "Types of data",
+        prompt: `Which data set is numerical and discrete?`,
+        choices: [
+          `Heights of students (cm)`,
+          `Time spent studying (hours)`,
+          `Number of siblings in a family`,
+          `Temperature during the day (°C)`
+        ],
+        answerIndex: 2,
+        explanation: `Discrete numerical data are counts (whole numbers). “Number of siblings” is a count.`
+      },
+      {
+        id: 8, topic: "Basic probability",
+        prompt: `A bag has 5 red, 3 blue, 2 green marbles. One marble is selected at random. Probability it is not blue is:`,
+        choices: [`\\(\\dfrac{3}{10}\\)`, `\\(\\dfrac{7}{10}\\)`, `\\(\\dfrac{1}{3}\\)`, `\\(\\dfrac{2}{5}\\)`],
+        answerIndex: 1,
+        explanation: `Total \\(=10\\). Not blue \\(=5+2=7\\). So \\(\\dfrac{7}{10}\\).`
+      },
+      {
+        id: 9, topic: "Union with overlap",
+        prompt: `A card is drawn from a standard 52-card deck. Probability of drawing a heart or a king is:`,
+        choices: [`\\(\\dfrac{4}{52}\\)`, `\\(\\dfrac{13}{52}\\)`, `\\(\\dfrac{16}{52}\\)`, `\\(\\dfrac{1}{4}\\)`],
+        answerIndex: 2,
+        explanation: `Hearts: 13, Kings: 4, overlap (king of hearts): 1.<br>
+        \\(P(H\\cup K)=\\dfrac{13+4-1}{52}=\\dfrac{16}{52}\\).`
+      },
+      {
+        id: 10, topic: "Two dice",
+        prompt: `Two dice are rolled. Probability the sum is at least 10 is:`,
+        choices: [`\\(\\dfrac{1}{6}\\)`, `\\(\\dfrac{1}{12}\\)`, `\\(\\dfrac{1}{9}\\)`, `\\(\\dfrac{1}{4}\\)`],
+        answerIndex: 0,
+        explanation: `Sums 10,11,12 have 3+2+1=6 outcomes out of 36.<br>
+        Probability \\(=\\dfrac{6}{36}=\\dfrac{1}{6}\\).`
+      },
+
+      // 11–20 Trig
+      {
+        id: 11, topic: "Degrees ↔ Radians",
+        prompt: `Convert \\(225^\\circ\\) to radians.`,
+        choices: [`\\(\\dfrac{5\\pi}{4}\\)`, `\\(\\dfrac{9\\pi}{8}\\)`, `\\(\\dfrac{3\\pi}{2}\\)`, `\\(\\dfrac{7\\pi}{6}\\)`],
+        answerIndex: 0,
+        explanation: `\\(225^\\circ\\times \\dfrac{\\pi}{180^\\circ}=\\dfrac{225\\pi}{180}=\\dfrac{5\\pi}{4}\\).`
+      },
+      {
+        id: 12, topic: "Degrees ↔ Radians",
+        prompt: `Convert \\(\\dfrac{7\\pi}{6}\\) to degrees.`,
+        choices: [`\\(180^\\circ\\)`, `\\(210^\\circ\\)`, `\\(240^\\circ\\)`, `\\(150^\\circ\\)`],
+        answerIndex: 1,
+        explanation: `\\(\\dfrac{7\\pi}{6}\\times\\dfrac{180^\\circ}{\\pi}=7\\times 30^\\circ=210^\\circ\\).`
+      },
+      {
+        id: 13, topic: "Quadrants & signs",
+        prompt: `Which quadrant contains angles where \\(\\sin\\theta<0\\) and \\(\\cos\\theta>0\\)?`,
+        choices: [`I`, `II`, `III`, `IV`],
+        answerIndex: 3,
+        explanation: `\\(\\cos\\theta>0\\) in Quadrants I and IV, and \\(\\sin\\theta<0\\) in Quadrants III and IV. Only Quadrant IV satisfies both.`
+      },
+      {
+        id: 14, topic: "Coterminal angles",
+        prompt: `A coterminal angle with \\(-75^\\circ\\) is:`,
+        choices: [`\\(285^\\circ\\)`, `\\(255^\\circ\\)`, `\\(105^\\circ\\)`, `\\(-285^\\circ\\)`],
+        answerIndex: 0,
+        explanation: `Add \\(360^\\circ\\): \\(-75^\\circ+360^\\circ=285^\\circ\\).`
+      },
+      {
+        id: 15, topic: "Reference angle",
+        prompt: `Reference angle for \\(\\theta=310^\\circ\\) is:`,
+        choices: [`\\(50^\\circ\\)`, `\\(40^\\circ\\)`, `\\(70^\\circ\\)`, `\\(130^\\circ\\)`],
+        answerIndex: 0,
+        explanation: `\\(310^\\circ\\) is in Quadrant IV. Reference angle \\(=360^\\circ-310^\\circ=50^\\circ\\).`
+      },
+      {
+        id: 16, topic: "Trig ratios from a point",
+        prompt: `Point \\(P(-8,\\,6)\\) lies on the terminal arm of angle \\(\\theta\\). Find the exact value of \\(\\sin\\theta\\).`,
+        choices: [`\\(\\dfrac{3}{5}\\)`, `\\(-\\dfrac{3}{5}\\)`, `\\(\\dfrac{4}{5}\\)`, `\\(-\\dfrac{4}{5}\\)`],
+        answerIndex: 0,
+        explanation: `\\(r=\\sqrt{(-8)^2+6^2}=\\sqrt{64+36}=10\\).<br>
+        \\(\\sin\\theta=\\dfrac{y}{r}=\\dfrac{6}{10}=\\dfrac{3}{5}\\). (Quadrant II, so sine is positive.)`
+      },
+      {
+        id: 17, topic: "Cosine Law",
+        prompt: `In \\(\\triangle ABC\\), \\(a=9\\), \\(b=12\\), \\(c=15\\). Find \\(\\angle A\\) (nearest degree).`,
+        choices: [`\\(37^\\circ\\)`, `\\(41^\\circ\\)`, `\\(49^\\circ\\)`, `\\(60^\\circ\\)`],
+        answerIndex: 0,
+        explanation: `Cosine Law: \\(\\cos A=\\dfrac{b^2+c^2-a^2}{2bc}\\).<br>
+        \\(\\cos A=\\dfrac{144+225-81}{2\\cdot12\\cdot15}=\\dfrac{288}{360}=0.8\\).<br>
+        \\(A=\\cos^{-1}(0.8)\\approx 36.87^\\circ\\approx 37^\\circ\\).`
+      },
+      {
+        id: 18, topic: "SSA ambiguous case",
+        prompt: `In an SSA case, \\(a=10\\), \\(b=14\\), and \\(\\angle A=30^\\circ\\). Which is true?`,
+        choices: [`No solution`, `Exactly 1 solution`, `Exactly 2 solutions`, `Infinitely many solutions`],
+        answerIndex: 2,
+        explanation: `Compute \\(h=b\\sin A=14\\sin 30^\\circ=14\\cdot 0.5=7\\).<br>
+        Since \\(h<a<b\\) (\\(7<10<14\\)), there are <b>two</b> possible triangles.`
+      },
+      {
+        id: 19, topic: "Trig equation",
+        prompt: `Solve for \\(x\\) in \\([0,2\\pi)\\): \\(2\\sin^{2}x-3\\sin x-2=0\\).`,
+        choices: [
+          `\\(x=\\dfrac{\\pi}{6},\\,\\dfrac{5\\pi}{6}\\)`,
+          `\\(x=\\dfrac{7\\pi}{6},\\,\\dfrac{11\\pi}{6}\\)`,
+          `\\(x=\\dfrac{\\pi}{2},\\,\\dfrac{3\\pi}{2}\\)`,
+          `\\(x=\\dfrac{7\\pi}{6},\\,\\dfrac{3\\pi}{2}\\)`
+        ],
+        answerIndex: 1,
+        explanation: `Let \\(s=\\sin x\\). Then \\(2s^2-3s-2=0\\).<br>
+        Factor: \\((2s+1)(s-2)=0\\). So \\(s=-\\dfrac12\\) or \\(s=2\\) (invalid).<br>
+        \\(\\sin x=-\\dfrac12\\) in \\([0,2\\pi)\\) at \\(x=\\dfrac{7\\pi}{6},\\,\\dfrac{11\\pi}{6}\\).`
+      },
+      {
+        id: 20, topic: "Inverse sine in triangles",
+        prompt: `If \\(\\sin A = 0.45\\) and \\(A\\) is an angle in a triangle, possible measures of \\(A\\) are:`,
+        choices: [`\\(27^\\circ\\) only`, `\\(27^\\circ\\) or \\(153^\\circ\\)`, `\\(45^\\circ\\) or \\(135^\\circ\\)`, `\\(63^\\circ\\) or \\(117^\\circ\\)`],
+        answerIndex: 1,
+        explanation: `\\(\\sin A=0.45\\) gives an acute angle \\(A\\approx \\sin^{-1}(0.45)\\approx 27^\\circ\\).<br>
+        In a triangle, the other possible angle with the same sine is \\(180^\\circ-27^\\circ=153^\\circ\\).`
+      },
+
+      // 21–30 Logs & Exponents
+      {
+        id: 21, topic: "Log laws",
+        prompt: `Which expression is equivalent to \\(\\log_{5}\\!\\left(x^{3}y^{2}\\right)\\)?`,
+        choices: [
+          `\\(3\\log_{5}(x)+2\\log_{5}(y)\\)`,
+          `\\(\\log_{5}(x+y)\\)`,
+          `\\(\\log_{5}(x^{5}y)\\)`,
+          `\\(5\\log_{5}(xy)\\)`
+        ],
+        answerIndex: 0,
+        explanation: `Use \\(\\log(ab)=\\log a+\\log b\\) and \\(\\log(a^k)=k\\log a\\):<br>
+        \\(\\log_{5}(x^3y^2)=\\log_{5}(x^3)+\\log_{5}(y^2)=3\\log_{5}x+2\\log_{5}y\\).`
+      },
+      {
+        id: 22, topic: "Log equations",
+        prompt: `Solve for \\(x\\): \\(\\log_{10}(x)-\\log_{10}(x-9)=1\\).`,
+        choices: [`\\(10\\)`, `\\(11\\)`, `\\(12\\)`, `\\(19\\)`],
+        answerIndex: 0,
+        explanation: `Combine logs: \\(\\log_{10}\\!\\left(\\dfrac{x}{x-9}\\right)=1\\).<br>
+        So \\(\\dfrac{x}{x-9}=10\\). Then \\(x=10x-90\\Rightarrow 9x=90\\Rightarrow x=10\\).`
+      },
+      {
+        id: 23, topic: "Exponents",
+        prompt: `Solve for \\(x\\): \\(5^{x}=125\\).`,
+        choices: [`\\(2\\)`, `\\(3\\)`, `\\(4\\)`, `\\(5\\)`],
+        answerIndex: 1,
+        explanation: `\\(125=5^3\\). So \\(5^x=5^3\\Rightarrow x=3\\).`
+      },
+      {
+        id: 24, topic: "Exponents",
+        prompt: `Solve: \\(2^{x+1}=16\\).`,
+        choices: [`\\(2\\)`, `\\(3\\)`, `\\(4\\)`, `\\(5\\)`],
+        answerIndex: 1,
+        explanation: `\\(16=2^4\\). So \\(2^{x+1}=2^4\\Rightarrow x+1=4\\Rightarrow x=3\\).`
+      },
+      {
+        id: 25, topic: "Inverse functions",
+        prompt: `The function \\(y=\\log_{4}(x)\\) is the inverse of:`,
+        choices: [`\\(y=4^{x}\\)`, `\\(y=x^{4}\\)`, `\\(y=\\dfrac{1}{4^{x}}\\)`, `\\(y=4x\\)`],
+        answerIndex: 0,
+        explanation: `Log base 4 is the inverse of the exponential base 4: \\(y=4^x\\).`
+      },
+      {
+        id: 26, topic: "Log equations",
+        prompt: `Solve: \\(\\log_{3}(x)= -2\\).`,
+        choices: [`\\(9\\)`, `\\(\\dfrac{1}{9}\\)`, `\\(-9\\)`, `\\(-\\dfrac{1}{9}\\)`],
+        answerIndex: 1,
+        explanation: `\\(\\log_3(x)=-2\\Rightarrow x=3^{-2}=\\dfrac{1}{9}\\).`
+      },
+      {
+        id: 27, topic: "Log simplification",
+        prompt: `Simplify: \\(\\log_{2}(32x)-\\log_{2}(x)\\) (assume \\(x>0\\)).`,
+        choices: [`\\(5\\)`, `\\(32\\)`, `\\(x^{5}\\)`, `\\(\\log_{2}(32)\\)`],
+        answerIndex: 0,
+        explanation: `\\(\\log_2(32x)-\\log_2(x)=\\log_2\\!\\left(\\dfrac{32x}{x}\\right)=\\log_2(32)=5\\).`
+      },
+      {
+        id: 28, topic: "Log equations",
+        prompt: `Solve: \\(\\log_{5}(x+4)=2\\).`,
+        choices: [`\\(6\\)`, `\\(10\\)`, `\\(21\\)`, `\\(25\\)`],
+        answerIndex: 2,
+        explanation: `\\(\\log_5(x+4)=2\\Rightarrow x+4=5^2=25\\Rightarrow x=21\\).`
+      },
+      {
+        id: 29, topic: "Natural log laws",
+        prompt: `Which is equivalent to \\(3\\ln(a)-\\ln(b)\\)?`,
+        choices: [
+          `\\(\\ln\\!\\left(\\dfrac{a^{3}}{b}\\right)\\)`,
+          `\\(\\ln(a^{3}-b)\\)`,
+          `\\(\\ln(3a-b)\\)`,
+          `\\(\\ln\\!\\left(\\dfrac{b^{3}}{a}\\right)\\)`
+        ],
+        answerIndex: 0,
+        explanation: `\\(3\\ln a=\\ln(a^3)\\). Then \\(\\ln(a^3)-\\ln b=\\ln\\!\\left(\\dfrac{a^3}{b}\\right)\\).`
+      },
+      {
+        id: 30, topic: "Log equations",
+        prompt: `Solve: \\(\\log_{7}(x)=\\log_{7}(3)+\\log_{7}(x-4)\\).`,
+        choices: [`\\(6\\)`, `\\(7\\)`, `\\(8\\)`, `\\(12\\)`],
+        answerIndex: 0,
+        explanation: `Combine: \\(\\log_7(x)=\\log_7(3(x-4))\\Rightarrow x=3(x-4)\\Rightarrow x=3x-12\\Rightarrow x=6\\).`
+      },
+
+      // 31–34 Finance replacements (FV/PV only)
+      {
+        id: 31, topic: "Future Value (annual)",
+        prompt: `You invest \\(\\$2\\,500\\) at an interest rate of \\(6\\%\\) per year, compounded annually, for \\(4\\) years. What is the future value?`,
+        choices: [`\\(\\$3\\,150\\)`, `\\(\\$3\\,160\\)`, `\\(\\$3\\,157\\)`, `\\(\\$3\\,180\\)`],
+        answerIndex: 2,
+        explanation: `\\(FV=PV(1+r)^t=2500(1.06)^4\\).<br>
+        \\((1.06)^4\\approx 1.2625\\Rightarrow FV\\approx 2500(1.2625)=3156.25\\approx \\$3\\,157\\).`
+      },
+      {
+        id: 32, topic: "Future Value (monthly)",
+        prompt: `An amount of \\(\\$4\\,000\\) is invested at \\(3.6\\%\\) per year, compounded monthly, for \\(2\\) years. Which is closest to the future value?`,
+        choices: [`\\(\\$4\\,290\\)`, `\\(\\$4\\,300\\)`, `\\(\\$4\\,320\\)`, `\\(\\$4\\,350\\)`],
+        answerIndex: 1,
+        explanation: `\\(FV=4000\\left(1+\\dfrac{0.036}{12}\\right)^{24}=4000(1.003)^{24}\\).<br>
+        \\((1.003)^{24}\\approx 1.074\\Rightarrow FV\\approx 4000(1.074)=4296\\approx \\$4\\,300\\).`
+      },
+      {
+        id: 33, topic: "Present Value (annual)",
+        prompt: `How much must be invested now at \\(5\\%\\) per year, compounded annually, to have \\(\\$10\\,000\\) in \\(6\\) years?`,
+        choices: [`\\(\\$7\\,350\\)`, `\\(\\$7\\,450\\)`, `\\(\\$7\\,460\\)`, `\\(\\$7\\,500\\)`],
+        answerIndex: 2,
+        explanation: `\\(PV=\\dfrac{FV}{(1+r)^t}=\\dfrac{10000}{(1.05)^6}\\).<br>
+        \\((1.05)^6\\approx 1.3401\\Rightarrow PV\\approx \\dfrac{10000}{1.3401}=7460\\).`
+      },
+      {
+        id: 34, topic: "Present Value (monthly)",
+        prompt: `You want \\(\\$8\\,000\\) in \\(3\\) years. What is the present value if the interest rate is \\(4.8\\%\\) per year, compounded monthly?`,
+        choices: [`\\(\\$6\\,850\\)`, `\\(\\$6\\,900\\)`, `\\(\\$6\\,930\\)`, `\\(\\$7\\,000\\)`],
+        answerIndex: 2,
+        explanation: `\\(PV=\\dfrac{8000}{\\left(1+\\dfrac{0.048}{12}\\right)^{36}}=\\dfrac{8000}{(1.004)^{36}}\\).<br>
+        \\((1.004)^{36}\\approx 1.155\\Rightarrow PV\\approx \\dfrac{8000}{1.155}=6930\\).`
+      },
+
+      // 35–36 Finance (rechecked Q36 answer corrected to B)
+      {
+        id: 35, topic: "Future Value of an annuity (estimate)",
+        prompt: `A bank account earns \\(4.8\\%\\) annually compounded monthly. You deposit \\(\\$500\\) at the end of each month for \\(3\\) years. Which is closest to the future value?`,
+        choices: [`\\(\\$18\\,000\\)`, `\\(\\$19\\,200\\)`, `\\(\\$19\\,800\\)`, `\\(\\$21\\,000\\)`],
+        answerIndex: 2,
+        explanation: `This is an ordinary annuity (payments at end).<br>
+        \\(i=\\dfrac{0.048}{12}=0.004\\), \\(n=36\\).<br>
+        \\(FV=PMT\\cdot\\dfrac{(1+i)^n-1}{i}=500\\cdot\\dfrac{(1.004)^{36}-1}{0.004}\\).<br>
+        \\((1.004)^{36}\\approx 1.155\\Rightarrow FV\\approx 500\\cdot\\dfrac{0.155}{0.004}=500\\cdot 38.75\\approx 19375\\). Closest: \\(\\$19\\,800\\).`
+      },
+      {
+        id: 36, topic: "Future Value (quarterly)",
+        prompt: `You invest \\(\\$3000\\) now at \\(6\\%\\) compounded quarterly for \\(5\\) years. Future value is closest to:`,
+        choices: [`\\(\\$3810\\)`, `\\(\\$4020\\)`, `\\(\\$4180\\)`, `\\(\\$4500\\)`],
+        answerIndex: 1,
+        explanation: `\\(FV=3000\\left(1+\\dfrac{0.06}{4}\\right)^{20}=3000(1.015)^{20}\\).<br>
+        \\((1.015)^{20}\\approx 1.347\\Rightarrow FV\\approx 3000(1.347)=4041\\). Closest: \\(\\$4020\\).`
+      },
+
+      // 37–42 Mixed probability & stats
+      {
+        id: 37, topic: "Mutually exclusive events",
+        prompt: `If events \\(A\\) and \\(B\\) are mutually exclusive and \\(P(A)=0.28\\), \\(P(B)=0.35\\), then \\(P(A\\cup B)=\\)`,
+        choices: [`\\(0.63\\)`, `\\(0.098\\)`, `\\(0.35\\)`, `\\(0.28\\)`],
+        answerIndex: 0,
+        explanation: `Mutually exclusive means no overlap, so \\(P(A\\cup B)=P(A)+P(B)=0.28+0.35=0.63\\).`
+      },
+      {
+        id: 38, topic: "Complements",
+        prompt: `Given \\(P(A)=0.6\\), find \\(P(A^{c})\\).`,
+        choices: [`\\(0.6\\)`, `\\(0.4\\)`, `\\(1.6\\)`, `\\(0\\)`],
+        answerIndex: 1,
+        explanation: `\\(P(A^c)=1-P(A)=1-0.6=0.4\\).`
+      },
+      {
+        id: 39, topic: "Conditional probability",
+        prompt: `If \\(P(B)=0.5\\) and \\(P(A\\cap B)=0.18\\), then \\(P(A\\mid B)=\\)`,
+        choices: [`\\(0.09\\)`, `\\(0.18\\)`, `\\(0.36\\)`, `\\(0.68\\)`],
+        answerIndex: 2,
+        explanation: `\\(P(A\\mid B)=\\dfrac{P(A\\cap B)}{P(B)}=\\dfrac{0.18}{0.5}=0.36\\).`
+      },
+      {
+        id: 40, topic: "Mean shifts",
+        prompt: `A data set has mean \\(12\\). If each value is increased by \\(5\\), the new mean is:`,
+        choices: [`\\(12\\)`, `\\(17\\)`, `\\(60\\)`, `depends on sample size`],
+        answerIndex: 1,
+        explanation: `Adding 5 to every value adds 5 to the mean. New mean \\(=12+5=17\\).`
+      },
+      {
+        id: 41, topic: "IQR",
+        prompt: `A set has \\(Q_{1}=18\\), median \\(=24\\), \\(Q_{3}=31\\). The IQR is:`,
+        choices: [`\\(7\\)`, `\\(13\\)`, `\\(49\\)`, `\\(24\\)`],
+        answerIndex: 1,
+        explanation: `\\(\\text{IQR}=Q_3-Q_1=31-18=13\\).`
+      },
+      {
+        id: 42, topic: "Basic probability",
+        prompt: `A fair spinner has 8 equal sectors numbered 1–8. Probability of landing on a multiple of 3 is:`,
+        choices: [`\\(\\dfrac{1}{8}\\)`, `\\(\\dfrac{1}{4}\\)`, `\\(\\dfrac{3}{8}\\)`, `\\(\\dfrac{1}{2}\\)`],
+        answerIndex: 1,
+        explanation: `Multiples of 3 from 1–8 are \\(3\\) and \\(6\\) (2 outcomes). Probability \\(=\\dfrac{2}{8}=\\dfrac{1}{4}\\).`
+      },
+
+      // 43–45 Probability replacements (no perms/combinations)
+      {
+        id: 43, topic: "Without replacement",
+        prompt: `A bag contains 4 red, 3 blue, and 5 green balls. One ball is drawn at random and not replaced. What is the probability that the first ball is green and the second ball is blue?`,
+        choices: [`\\(\\dfrac{1}{11}\\)`, `\\(\\dfrac{5}{44}\\)`, `\\(\\dfrac{3}{22}\\)`, `\\(\\dfrac{15}{132}\\)`],
+        answerIndex: 1,
+        explanation: `\\(P(G\\text{ then }B)=\\dfrac{5}{12}\\times\\dfrac{3}{11}=\\dfrac{15}{132}=\\dfrac{5}{44}\\).`
+      },
+      {
+        id: 44, topic: "Two rolls",
+        prompt: `A fair six-sided die is rolled twice. What is the probability that both rolls show the same number?`,
+        choices: [`\\(\\dfrac{1}{36}\\)`, `\\(\\dfrac{1}{12}\\)`, `\\(\\dfrac{1}{6}\\)`, `\\(\\dfrac{5}{36}\\)`],
+        answerIndex: 2,
+        explanation: `There are 6 matching pairs: (1,1), (2,2), …, (6,6).<br>
+        Each has probability \\(\\dfrac{1}{36}\\). Total \\(=6\\cdot\\dfrac{1}{36}=\\dfrac{1}{6}\\).`
+      },
+      {
+        id: 45, topic: "Cards without replacement",
+        prompt: `A standard deck of 52 cards is used. One card is drawn and not replaced. What is the probability that both cards are hearts?`,
+        choices: [`\\(\\dfrac{13}{52}\\)`, `\\(\\dfrac{13}{51}\\)`, `\\(\\dfrac{1}{17}\\)`, `\\(\\dfrac{1}{221}\\)`],
+        answerIndex: 2,
+        explanation: `\\(P(H\\text{ then }H)=\\dfrac{13}{52}\\times\\dfrac{12}{51}=\\dfrac{156}{2652}=\\dfrac{1}{17}\\).`
+      },
+
+      // 46–51 (with corrected Q46)
+      {
+        id: 46, topic: "Binomial coefficient",
+        prompt: `The coefficient of \\(x^{2}\\) in \\((x+3)^{5}\\) is:`,
+        choices: [`\\(270\\)`, `\\(405\\)`, `\\(540\\)`, `\\(810\\)`],
+        answerIndex: 0,
+        explanation: `General term: \\(\\binom{5}{k}x^{5-k}3^{k}\\). For \\(x^2\\), need \\(5-k=2\\Rightarrow k=3\\).<br>
+        Coefficient \\(=\\binom{5}{3}3^3=10\\cdot 27=270\\).`
+      },
+      {
+        id: 47, topic: "Rational exponents",
+        prompt: `Solve: \\(x^{\\tfrac{3}{2}}=27\\) for \\(x>0\\).`,
+        choices: [`\\(3\\)`, `\\(6\\)`, `\\(9\\)`, `\\(12\\)`],
+        answerIndex: 2,
+        explanation: `Raise both sides to the power \\(\\tfrac{2}{3}\\):<br>
+        \\(x=(27)^{2/3}=(\\sqrt[3]{27})^2=3^2=9\\).`
+      },
+      {
+        id: 48, topic: "Exponent laws",
+        prompt: `Simplify: \\(\\left(\\dfrac{x^{3}y^{-2}}{x^{-1}y^{4}}\\right)\\).`,
+        choices: [`\\(x^{4}y^{-6}\\)`, `\\(x^{2}y^{2}\\)`, `\\(x^{-4}y^{6}\\)`, `\\(x^{3}y^{-2}\\)`],
+        answerIndex: 0,
+        explanation: `Divide powers: \\(x^{3}/x^{-1}=x^{3-(-1)}=x^4\\).<br>
+        \\(y^{-2}/y^{4}=y^{-2-4}=y^{-6}\\). So \\(x^4y^{-6}\\).`
+      },
+      {
+        id: 49, topic: "Inverse functions",
+        prompt: `If \\(f(x)=2x-5\\), then \\(f^{-1}(x)=\\)`,
+        choices: [`\\(\\dfrac{x-5}{2}\\)`, `\\(\\dfrac{x+5}{2}\\)`, `\\(2x+5\\)`, `\\(\\dfrac{2}{x-5}\\)`],
+        answerIndex: 1,
+        explanation: `Let \\(y=2x-5\\). Swap: \\(x=2y-5\\). Solve: \\(2y=x+5\\Rightarrow y=\\dfrac{x+5}{2}\\).`
+      },
+      {
+        id: 50, topic: "Solving rational equations",
+        prompt: `Solve: \\(\\dfrac{2}{x-1}+\\dfrac{3}{x+1}=1\\).`,
+        choices: [`\\(x=0,\\,4\\)`, `\\(x=1,\\,-1\\)`, `\\(x=-4,\\,0\\)`, `\\(x=-1,\\,1\\)`],
+        answerIndex: 0,
+        explanation: `Multiply both sides by \\((x-1)(x+1)\\):<br>
+        \\(2(x+1)+3(x-1)=(x-1)(x+1)\\).<br>
+        \\(2x+2+3x-3=x^2-1\\Rightarrow 5x-1=x^2-1\\Rightarrow x^2-5x=0\\Rightarrow x(x-5)=0\\).<br>
+        Solutions: \\(x=0\\) or \\(x=5\\). But check choices—why 4? Let's re-check algebra carefully:<br>
+        \\((x-1)(x+1)=x^2-1\\). LHS: \\(2(x+1)+3(x-1)=2x+2+3x-3=5x-1\\).<br>
+        Set equal: \\(5x-1=x^2-1\\Rightarrow x^2-5x=0\\Rightarrow x=0\\) or \\(x=5\\).<br>
+        So the correct pair is \\(x=0\\) and \\(x=5\\). The options were from earlier draft.<br><br>
+        <b>NOTE:</b> This question has been corrected below (choices updated) to match the right solutions.`
+      },
+      {
+        id: 51, topic: "Union probability",
+        prompt: `If \\(P(A)=0.40\\), \\(P(B)=0.25\\), and \\(P(A\\cap B)=0.10\\), then \\(P(A\\cup B)=\\)`,
+        choices: [`\\(0.55\\)`, `\\(0.65\\)`, `\\(0.30\\)`, `\\(0.75\\)`],
+        answerIndex: 0,
+        explanation: `Use \\(P(A\\cup B)=P(A)+P(B)-P(A\\cap B)\\).<br>
+        \\(0.40+0.25-0.10=0.55\\).`
+      }
+    ];
+
+    // --- Fix Q50 properly (update choices & answer/explanation to match correct solutions) ---
+    // Replace Q50 in place:
+    const q50Index = questions.findIndex(q => q.id === 50);
+    questions[q50Index] = {
+      id: 50, topic: "Solving rational equations",
+      prompt: `Solve: \\(\\dfrac{2}{x-1}+\\dfrac{3}{x+1}=1\\).`,
+      choices: [`\\(x=0,\\,5\\)`, `\\(x=1,\\,-1\\)`, `\\(x=-4,\\,0\\)`, `\\(x=-1,\\,1\\)`],
+      answerIndex: 0,
+      explanation: `Multiply both sides by \\((x-1)(x+1)\\):<br>
+      \\(2(x+1)+3(x-1)=(x-1)(x+1)\\).<br>
+      LHS: \\(2x+2+3x-3=5x-1\\). RHS: \\(x^2-1\\).<br>
+      \\(5x-1=x^2-1\\Rightarrow x^2-5x=0\\Rightarrow x(x-5)=0\\).<br>
+      So \\(x=0\\) or \\(x=5\\). (Also note \\(x\\neq 1,-1\\) so both are allowed.)`
+    };
+
+    // ---------------------------
+    // STATE
+    // ---------------------------
+    let currentIndex = 0;       // index in questions array
+    let correct = 0;
+    let attempted = 0;
+    let answeredThisQ = false;
+
+    const LS_KEY = "quiz_progress_v1";
+
+    // ---------------------------
+    // ELEMENTS
+    // ---------------------------
+    const homeEl = document.getElementById("home");
+    const quizEl = document.getElementById("quiz");
+    const finishEl = document.getElementById("finish");
+
+    const correctCountEl = document.getElementById("correctCount");
+    const attemptedCountEl = document.getElementById("attemptedCount");
+    const qCounterEl = document.getElementById("qCounter");
+
+    const qTitleEl = document.getElementById("qTitle");
+    const qTopicEl = document.getElementById("qTopic");
+    const qPromptEl = document.getElementById("qPrompt");
+    const choicesEl = document.getElementById("choices");
+
+    const acceptBtn = document.getElementById("acceptBtn");
+    const continueBtn = document.getElementById("continueBtn");
+    const backHomeBtn = document.getElementById("backHomeBtn");
+
+    const feedbackEl = document.getElementById("feedback");
+    const fbTitleEl = document.getElementById("fbTitle");
+    const fbBodyEl = document.getElementById("fbBody");
+
+    const startQInput = document.getElementById("startQ");
+    const startCorrectInput = document.getElementById("startCorrect");
+    const startAttemptedInput = document.getElementById("startAttempted");
+    const beginBtn = document.getElementById("beginBtn");
+
+    const resumeBtn = document.getElementById("resumeBtn");
+    const resetSavedBtn = document.getElementById("resetSavedBtn");
+
+    const saveLink = document.getElementById("saveLink");
+    const loadLink = document.getElementById("loadLink");
+    const restartLink = document.getElementById("restartLink");
+
+    const finalCorrectEl = document.getElementById("finalCorrect");
+    const finalAttemptedEl = document.getElementById("finalAttempted");
+    const restartBtn = document.getElementById("restartBtn");
+    const finishHomeBtn = document.getElementById("finishHomeBtn");
+
+    // ---------------------------
+    // HELPERS
+    // ---------------------------
+    function show(el){
+      homeEl.style.display = "none";
+      quizEl.style.display = "none";
+      finishEl.style.display = "none";
+      el.style.display = "block";
+    }
+
+    function clamp(n, lo, hi){
+      return Math.max(lo, Math.min(hi, n));
+    }
+
+    function updateScoreUI(){
+      correctCountEl.textContent = String(correct);
+      attemptedCountEl.textContent = String(attempted);
+      qCounterEl.textContent = `${questions[currentIndex].id} / ${questions.length}`;
+    }
+
+    function clearFeedback(){
+      feedbackEl.style.display = "none";
+      feedbackEl.classList.remove("ok", "no");
+      fbTitleEl.textContent = "";
+      fbBodyEl.innerHTML = "";
+    }
+
+    function renderQuestion(){
+      answeredThisQ = false;
+      clearFeedback();
+      continueBtn.disabled = true;
+
+      const q = questions[currentIndex];
+      qTitleEl.textContent = `Question ${q.id}`;
+      qTopicEl.textContent = q.topic ? `Topic: ${q.topic}` : "";
+      qPromptEl.innerHTML = q.prompt;
+
+      choicesEl.innerHTML = "";
+      const letters = ["A","B","C","D"];
+      q.choices.forEach((choiceText, i) => {
+        const wrap = document.createElement("label");
+        wrap.className = "choice";
+        wrap.innerHTML = `
+          <input type="radio" name="choice" value="${i}">
+          <div class="letter">${letters[i]})</div>
+          <div class="text">${choiceText}</div>
+        `;
+        choicesEl.appendChild(wrap);
+      });
+
+      updateScoreUI();
+
+      // Typeset MathJax
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise([qPromptEl, choicesEl]).catch(() => {});
+      }
+    }
+
+    function getSelectedIndex(){
+      const sel = document.querySelector('input[name="choice"]:checked');
+      return sel ? Number(sel.value) : null;
+    }
+
+    function lockChoices(){
+      document.querySelectorAll('input[name="choice"]').forEach(inp => inp.disabled = true);
+      acceptBtn.disabled = true;
+    }
+
+    function unlockForNext(){
+      acceptBtn.disabled = false;
+      document.querySelectorAll('input[name="choice"]').forEach(inp => inp.checked = false);
+    }
+
+    function showFeedback(isCorrect, q){
+      feedbackEl.style.display = "block";
+      feedbackEl.classList.toggle("ok", isCorrect);
+      feedbackEl.classList.toggle("no", !isCorrect);
+
+      fbTitleEl.textContent = isCorrect ? "Correct ✅" : "Not quite ❌";
+      const letters = ["A","B","C","D"];
+      const correctLetter = letters[q.answerIndex];
+
+      fbBodyEl.innerHTML = `
+        <div><b>Correct answer:</b> ${correctLetter}</div>
+        <div style="margin-top:8px;">${q.explanation}</div>
+      `;
+
+      // Typeset explanation
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise([feedbackEl]).catch(() => {});
+      }
+    }
+
+    function goNext(){
+      currentIndex++;
+      if (currentIndex >= questions.length){
+        finalCorrectEl.textContent = String(correct);
+        finalAttemptedEl.textContent = String(attempted);
+        show(finishEl);
+        return;
+      }
+      acceptBtn.disabled = false;
+      unlockForNext();
+      renderQuestion();
+    }
+
+    function startFromHome(){
+      const startQ = clamp(Number(startQInput.value || 1), 1, questions.length);
+      const startCorrect = Math.max(0, Number(startCorrectInput.value || 0));
+      let startAttempted = Number(startAttemptedInput.value || 0);
+
+      // If attempted left blank or smaller than correct, make it at least correct
+      if (!Number.isFinite(startAttempted) || startAttempted < startCorrect) startAttempted = startCorrect;
+
+      correct = Math.floor(startCorrect);
+      attempted = Math.floor(startAttempted);
+
+      // Find index where question.id === startQ
+      currentIndex = questions.findIndex(q => q.id === startQ);
+      if (currentIndex < 0) currentIndex = 0;
+
+      show(quizEl);
+      acceptBtn.disabled = false;
+      renderQuestion();
+    }
+
+    function saveProgress(){
+      const payload = { currentId: questions[currentIndex].id, correct, attempted };
+      localStorage.setItem(LS_KEY, JSON.stringify(payload));
+      alert("Progress saved.");
+      refreshSavedButtons();
+    }
+
+    function loadProgress(){
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) { alert("No saved progress found."); return; }
+      try{
+        const data = JSON.parse(raw);
+        const idx = questions.findIndex(q => q.id === data.currentId);
+        currentIndex = idx >= 0 ? idx : 0;
+        correct = Number.isFinite(data.correct) ? data.correct : 0;
+        attempted = Number.isFinite(data.attempted) ? data.attempted : 0;
+        show(quizEl);
+        acceptBtn.disabled = false;
+        renderQuestion();
+      } catch(e){
+        alert("Saved progress was corrupted.");
+      }
+    }
+
+    function clearSaved(){
+      localStorage.removeItem(LS_KEY);
+      alert("Saved progress cleared.");
+      refreshSavedButtons();
+    }
+
+    function refreshSavedButtons(){
+      const hasSaved = !!localStorage.getItem(LS_KEY);
+      resumeBtn.style.display = hasSaved ? "inline-block" : "none";
+      resetSavedBtn.style.display = hasSaved ? "inline-block" : "none";
+    }
+
+    // ---------------------------
+    // EVENTS
+    // ---------------------------
+    beginBtn.addEventListener("click", startFromHome);
+    resumeBtn.addEventListener("click", loadProgress);
+    resetSavedBtn.addEventListener("click", clearSaved);
+
+    acceptBtn.addEventListener("click", () => {
+      if (answeredThisQ) return;
+
+      const selected = getSelectedIndex();
+      if (selected === null){
+        alert("Please select an answer first.");
+        return;
+      }
+
+      const q = questions[currentIndex];
+      attempted += 1;
+
+      const isCorrect = (selected === q.answerIndex);
+      if (isCorrect) correct += 1;
+
+      answeredThisQ = true;
+      lockChoices();
+      showFeedback(isCorrect, q);
+      updateScoreUI();
+      continueBtn.disabled = false;
+    });
+
+    continueBtn.addEventListener("click", () => {
+      // move on after feedback shown
+      acceptBtn.disabled = false;
+      unlockForNext();
+      goNext();
+    });
+
+    backHomeBtn.addEventListener("click", () => {
+      show(homeEl);
+      refreshSavedButtons();
+      updateScoreUI();
+    });
+
+    saveLink.addEventListener("click", saveProgress);
+    loadLink.addEventListener("click", loadProgress);
+    restartLink.addEventListener("click", () => {
+      correct = 0; attempted = 0; currentIndex = 0;
+      show(quizEl);
+      acceptBtn.disabled = false;
+      renderQuestion();
+    });
+
+    restartBtn.addEventListener("click", () => {
+      correct = 0; attempted = 0; currentIndex = 0;
+      show(quizEl);
+      acceptBtn.disabled = false;
+      renderQuestion();
+    });
+
+    finishHomeBtn.addEventListener("click", () => {
+      show(homeEl);
+      refreshSavedButtons();
+    });
+
+    // ---------------------------
+    // INIT
+    // ---------------------------
+    show(homeEl);
+    refreshSavedButtons();
+    updateScoreUI();
+  </script>
+</body>
+</html>
